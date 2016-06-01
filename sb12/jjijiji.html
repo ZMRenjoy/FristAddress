@@ -1,0 +1,345 @@
+,,,n<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<link rel="stylesheet" type="text/css" href="css/" />
+		<title></title>
+		<style type="text/css">
+			* {
+				margin: 0;
+				padding: 0;
+				text-align: center;
+			}
+			
+			#wrap {
+				position: relative;
+				margin: 0 auto;
+			}
+			
+			#wrap div {
+				width: 20px;
+				height: 20px;
+				border: 1px solid rgba( 222, 184, 135, .2);
+				float: left;
+				box-sizing: border-box;
+			}
+			
+			.red {
+				background-color: red;
+			}
+			
+			.wood {
+				background-color: burlywood;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="big">
+			<div id="wrap"></div>
+			<button id="restart">重新开始</button><br/>
+		</div>
+	</body>
+	<script type="text/javascript">
+		var big = document.getElementById("big");
+		var wrap = document.getElementById("wrap")
+		var w = document.documentElement.clientWidth;
+		var h = document.documentElement.clientHeight;
+		big.style.width = w + "px";
+		big.style.height = h + "px";
+		var width = w - (w % 20);
+		var height = h - (h % 20) - 40;
+		wrap.style.width = width + "px";
+		wrap.style.height = height + "px";
+		var colNumber = width / 20;
+		var rowNumber = height / 20;
+		var board = [];
+		var foodX = null;
+		var foodY = null;
+		var timer = null; //游戏定时器
+		var snakeLength = 3; //蛇的默认长度
+		var snakeHeader = snakeLength - 1;
+		var snakeArray = []; //蛇的数组
+		var x = 0; //默认所在行数
+		var direction = "right"; //默认方向
+		var delayTime = 200;
+		var frag = document.createDocumentFragment();
+		for (var i = 0; i < rowNumber; i++) {
+			var row = []
+			for (var j = 0; j < colNumber; j++) {
+				var div = document.createElement('div');
+				row.push(div);
+				frag.appendChild(div);
+			};
+			board.push(row);
+		};
+		wrap.appendChild(frag);
+		for (var i = 0; i < snakeLength; i++) {
+			board[x][i].className = "red";
+			snakeArray.push(board[x][i]);
+		};
+		//游戏开始
+		setTimeout(gameStart, delayTime)
+
+		function gameStart() {
+			//向某一方向移动
+			switch (direction) {
+				case "up":
+					if (x <= 0) {
+						gameOver();
+						return;
+					}
+					//尾巴消失
+					tailHide();
+					//碰到自己
+					var header = board[x - 1][snakeHeader];
+					if (checkMe(header)) {
+						gameOver();
+						return;
+					}
+					//碰到食物
+					if (isAetFood()) {
+						snakeArray.push(board[foodX][foodY]);
+						snakeLength++;
+						creatFood();
+					} else {
+						//正常
+						move();
+						snakeArray[snakeArray.length - 1] = board[x - 1][snakeHeader];
+					}
+					//蛇头显示
+					headShow();
+					x--;
+					timer = setTimeout(gameStart, delayTime)
+					break;
+				case "right":
+					//碰到墙壁
+					if (snakeHeader + 1 >= colNumber) {
+						gameOver();
+						return;
+					}
+					//尾巴消失
+					tailHide();
+					//碰到自己
+					var header = board[x][snakeHeader + 1];
+					if (checkMe(header)) {
+						gameOver();
+						return;
+					}
+					//碰到食物
+					if (isAetFood()) {
+						snakeArray.push(board[foodX][foodY]);
+						snakeLength++;
+						creatFood();
+					} else {
+						//正常
+						move();
+						snakeArray[snakeArray.length - 1] = board[x][snakeHeader + 1];
+					}
+					//蛇头显示
+					headShow();
+					snakeHeader++;
+					timer = setTimeout(gameStart, delayTime)
+					break;
+				case "down":
+					//碰到墙壁
+					if (x + 1 >= rowNumber) {
+						gameOver();
+						return;
+					}
+					//尾巴消失
+					tailHide();
+					//碰到自己
+					var header = board[x + 1][snakeHeader];
+					if (checkMe(header)) {
+						gameOver();
+						return;
+					}
+					//碰到食物
+					if (isAetFood()) {
+						snakeArray.push(board[foodX][foodY]);
+						snakeLength++;
+						creatFood();
+					} else {
+						//正常
+						move();
+						snakeArray[snakeArray.length - 1] = board[x + 1][snakeHeader];
+					}
+					//蛇头显示
+					headShow();
+					x++;
+					timer = setTimeout(gameStart, delayTime)
+					break;
+				case "left":
+					if (snakeHeader <= 0) {
+						gameOver();
+						return;
+					}
+					//尾巴消失
+					tailHide();
+					//碰到自己
+					var header = board[x][snakeHeader - 1];
+					if (checkMe(header)) {
+						gameOver();
+						return;
+					}
+					//碰到食物
+					if (isAetFood()) {
+						snakeArray.push(board[foodX][foodY]);
+						snakeLength++;
+						creatFood();
+					} else {
+						//正常
+						move();
+						snakeArray[snakeArray.length - 1] = board[x][snakeHeader - 1];
+					}
+					//蛇头显示
+					headShow();
+					snakeHeader--;
+					timer = setTimeout(gameStart, delayTime)
+					break;
+			}
+		}
+		//创建食物
+		creatFood();
+		function creatFood() {
+			foodY = parseInt(Math.random() * colNumber);
+			foodX = parseInt(Math.random() * rowNumber);
+			if (isOnSnake()) {
+				creatFood();
+				return;
+			} else {
+				board[foodX][foodY].className = "wood";
+			}
+		}
+		//游戏结束
+		function gameOver() {
+			clearTimeout(timer);
+			return;
+		};
+		//尾巴消失
+		function tailHide() {
+			snakeArray[0].className = "";
+		};
+		//检测自己碰撞
+		function checkMe(hd) {
+			for (var i = 0; i < snakeArray.length; i++) {
+				if (snakeArray[i] == hd) {
+					return true;
+				}
+			};
+		}
+		
+		//吃到食物
+		function isAetFood() {
+			//下一目标是否与食物相等
+			var nextPointX = x;
+			var nextPointY = snakeHeader;
+			if (direction == "up") {
+				nextPointX--;
+			}
+			if (direction == "right") {
+				nextPointY++;
+			}
+			if (direction == "down") {
+				nextPointX++;
+			}
+			if (direction == "left") {
+				nextPointY--;
+			}
+			if (nextPointX == foodX && nextPointY == foodY) {
+				return true;
+			} else {
+				return false;
+			}
+		};
+		//移动
+		function move() {
+			for (var i = 0; i < snakeArray.length; i++) {
+				snakeArray[i] = snakeArray[i + 1];
+			};
+		};
+		//头部显示
+		function headShow() {
+			snakeArray[snakeArray.length - 1].className = "red";
+		};
+		function isOnSnake() {
+			if (board[foodX][foodY].className == "red") {
+				return true;
+			}
+		}
+		// 键盘点击事件
+		wrap.addEventListener('touchstart', function(event) {
+			startx = event.touches[0].pageX;
+			starty = event.touches[0].pageY;
+		});
+		wrap.addEventListener('touchend', function(event) {
+			endx = event.changedTouches[0].pageX;
+			endy = event.changedTouches[0].pageY;
+			var deltax = endx - startx;
+			var deltay = endy - starty;
+			if (Math.abs(deltax) < 0.05 * document.documentElement.clientWidth && Math.abs(deltay) < 0.02 * document.documentElement.clientHeight)
+				return;
+			if (Math.abs(deltax) >= Math.abs(deltay)) {
+				if (deltax > 0) //right
+				{
+					if (direction != "left") {
+						direction = "right";
+					}
+				} else //left
+				{
+					if (direction != "right") {
+						direction = "left";
+					}
+				}
+			} else {
+				if (deltay > 0) //down
+				{
+					if (direction != "up") {
+						direction = "down";
+					}
+				} else //up
+				{
+					if (direction != "down") {
+						direction = "up";
+					}
+				}
+			}
+		});
+		window.onkeydown = function(event) {
+			switch (event.keyCode) {
+				case 37:
+					//左
+					if (direction != "right") {
+						direction = "left";
+					}
+					break;
+				case 38:
+					//上
+					if (direction != "down") {
+						direction = "up";
+					}
+					break;
+				case 39:
+					//右
+					if (direction != "left") {
+						direction = "right";
+					}
+					break;
+				case 40:
+					//下
+					if (direction != "up") {
+						direction = "down";
+					}
+					break;
+			}
+		}
+	var restart = document.getElementById("restart")
+	restart.ontouchstart = function(){
+		window.location.reload();
+	}
+	</script>
+
+</html>
