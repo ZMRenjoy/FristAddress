@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<style type="text/css">
+			.wrap{
+				width: 800px;
+				/*height: 1000px;*/
+				border: 1px solid red;
+				margin: 0 auto;
+				overflow: hidden;
+			}
+			.wrap ul{
+				float: left;
+				width: 200px;
+				padding: 10px;
+				list-style: none;
+				box-sizing: border-box;
+			}
+			.wrap ul li{
+				background-color: #CCCCCC;
+				margin-bottom: 20px;
+				font-size: 1.5rem;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="wrap" class="wrap">
+			<ul>
+			<li>第一列</li>
+			</ul>
+			<ul>
+				<li>第二列</li>
+			</ul>
+			<ul>
+				<li>第三列</li>
+			</ul>
+			<ul>
+				<li>第四列</li>
+			</ul>
+		</div>
+	</body>
+	<script type="text/javascript">
+		function randomFunction(min , max){
+			return parseInt(Math.random() * (max - min)) + min;
+		}
+		var wrap = document.getElementById("wrap");
+		var uls = document.getElementsByTagName("ul");
+		
+		function createli(){
+			for (var i = 0; i < 50; i++) {
+				var li = document.createElement("li");
+				li.innerHTML = i;
+				var h = randomFunction(100 , 300);
+				li.style.height = h + "px";
+				var arrH = [];
+				for (var j = 0; j < uls.length; j++) {
+					arrH.push(uls[j].offsetHeight);
+				}
+				var min = arrH[0];
+				var minIndex = 0;
+				for (var j = 0; j < uls.length; j++) {
+					if(arrH[j] < min){
+						min = arrH[j];
+						minIndex = j;
+					}
+				}
+				uls[minIndex].appendChild(li);
+				
+			}
+		}
+		createli();
+		
+		window.onscroll = function(){
+			var windowHight = document.documentElement.clientHeight;
+			var bodyContentHeight = document.documentElement.offsetHeight;
+			
+			var scrollMaxHight = bodyContentHeight - windowHight;
+			var scroTop = document.body.scrollTop;
+			if(scroTop == scrollMaxHight){
+				createli();
+			}
+		}
+	</script>
+</html>

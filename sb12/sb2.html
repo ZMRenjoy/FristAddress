@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			*{
+				margin: 0;
+				padding: 0;
+			}
+			#wrap{
+				position: relative;
+				list-style: none;
+				margin: 0 auto;
+			}
+			#wrap li{
+				width: 200px;
+				font-size: 1.5rem;
+				position: absolute;
+				background-color: #CCCCCC;
+				-webkit-transition: all 2s;
+			}
+		</style>
+	</head>
+	<body>
+		<ul id="wrap"></ul>
+	</body>
+	<script type="text/javascript">
+		function randomFunction(max , min){
+			return parseInt(Math.random() * (max - min)) + min;
+		}
+		var wrapUL = document.getElementById("wrap");
+		var width = 200;
+		var rightPadding = 10;
+		var hs = [];
+		var num = 0;
+		function setLiPos(bol){
+			var lis = wrapUL.getElementsByTagName("li");
+			var windowBody = document.documentElement.clientWidth;
+			var cols = parseInt(windowBody / width);
+			wrapUL.style.width = cols * (width + rightPadding) + "px";
+			var arrT = [];
+			for (var i = 0; i < cols; i++) {
+				arrT[i] = 0;
+			}
+			function createLi(index){
+				var li = lis[index]||document.createElement("li");
+				li.innerHTML = index;
+				var h = hs[index] || randomFunction(100, 300);
+				li.style.height = h + "px";
+				
+				if(bol){
+					hs.push(h);
+				}
+				var min = arrT[0];
+				var minIndex = 0;
+				for (var i = 0; i < arrT.length; i++) {
+					if(min > arrT[i]){
+						min = arrT[i];
+						minIndex = i;
+					}
+				}
+				li.style.top = arrT[minIndex] + "px";
+				li.style.left = minIndex * (width + rightPadding) + "px";
+				arrT[minIndex] += (h + rightPadding);
+				bol&&wrapUL.appendChild(li);
+			}
+			for(var i = 0; i < 20; i++){
+				if(bol){
+					num++;
+				}
+				createLi(i);
+			}
+		}
+		setLiPos(true);
+		window.onresize = function(){
+			setLiPos(false);
+		}
+	</script>
+</html>

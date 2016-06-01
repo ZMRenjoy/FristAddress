@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+canvas {border:1px solid black;}
+</style>
+</head>
+<body>
+
+<button onclick="myFunction()">尝试一下</button>
+
+<p>点击按钮创建 CANVAS 元素，绘制一个红色矩形。</p>
+
+<script>
+function myFunction()
+{
+var x = document.createElement("CANVAS");
+var ctx=x.getContext("2d");
+ctx.fillStyle="#FF0000";
+ctx.fillRect(20,20,150,100);
+document.body.appendChild(x);
+}
+</script>
+
+</body>
+</html>

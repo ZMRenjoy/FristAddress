@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			#wrap{
+				width: 100%;
+				height: 800px;
+				overflow: hidden;
+				position: relative;
+			}
+			#middle{
+				width: 9999999px;
+				height: 800px;
+				float: left;
+				position: absolute;
+				left: 0;
+				-webkit-transition: all 2s;
+			}
+			#middle div{
+				float: left;
+				text-align: center;
+			}
+			#btns{
+				position: fixed;
+				right: 90px;
+				top: 60px;
+			}
+			#btns a{
+				text-decoration: none;
+				background-color: white;
+				margin: 10px;
+				padding: 10px;
+			}
+			#middle img{
+				width: 1904px;
+				height: 800px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="wrap">
+			<div id="middle">
+				<img src="img/1.jpg"/>
+				<img src="img/2.jpg"/>
+				<img src="img/3.jpg"/>
+				<img src="img/4.jpg"/>
+				<img src="img/5.jpeg"/>
+				<img src="img/6.jpg"/>
+				<img src="img/7.jpg"/>
+				<img src="img/1.jpg"/>
+			</div>
+			<div id="btns">
+				<a id="last" href="###">&lt;</a>
+				<a id="next" href="###">&gt;</a>
+			</div>
+		</div>
+		<script type="text/javascript" src="js/tween.js"></script>
+		<script type="text/javascript">
+			var wrap = document.getElementById("wrap");
+			var middle = document.getElementById("middle");
+			var last = document.getElementById("last");
+			var next = document.getElementById("next");
+			var imgs = document.getElementsByTagName("img");
+			
+			middle.style.width = imgs[0].offsetWidth * imgs.length + "px";
+			middle.style.left = -imgs[0].offsetWidth + "px";
+			
+			function move(){
+			var start = middle.offsetLeft;
+			var end = -index * imgs[0].offsetWidth;
+			var change = end - start;
+			var t = 0;
+			var d = 10;
+			timer = setInterval(function(){
+				t++;
+				if(t >= d){
+					clearInterval(timer);
+				}
+				middle.style.left = Tween.Linear(t , start , change , d) + "px";
+			} , 10);		
+		}
+		var index = 1;
+		next.onclick = function(){
+			index++;
+			if(index > imgs.length - 1){
+				index = 1;
+				middle.style.left = "0px";
+			}
+			move();
+		}
+		last.onclick = function(){
+			index--;
+			if(index < 0){
+				index = imgs.length - 7;
+				middle.style.left = -(imgs.length - 6) * imgs[0].offsetWidth + "px";
+			 }
+			move();
+		}
+			
+		</script>
+	</body>
+</html>
